@@ -1,22 +1,19 @@
 # Investor Portal Demo
 
-An invite-only investor onboarding walkthrough with real email authentication and synthetic investment data. This evaluation package includes the application source, SQL migrations, configuration scripts, tests, and a journey guide.
+An invite-only investor onboarding demo with real email authentication and synthetic investment data. This evaluation package includes the application source, SQL migrations, configuration scripts, tests, and a journey guide. The full MVP will be delivered once the demo is fully tested.
 
-**Status: working demonstration; production MVP incomplete.** Login emails and sessions are real. The walkthrough's investors, offering, financial results, documents, verification, signatures, incoming transfers, and operational notification previews are illustrative. No money moves through the demo.
+## MVP Design goals
 
-## Design goals
-
-- Give investors one clear next action from commitment through reporting.
-- Keep investor actions separate from sponsor approval, countersign, and funding acceptance.
-- Show who owns the next step and make exceptions visible instead of silently advancing an investment.
-- Support individual, joint, and company investment journeys; show IRA routing as a future capability.
+- Give investors one clear next action from commitment through final distribution.
+- Support individual, joint, corporate, and IRA investment journeys.
 - Keep the interface readable: warm neutral investor screens, a distinct sponsor workspace, and plain status language.
 - Enforce real data permissions in the database and private storage, alongside application checks.
-- Keep configuration repeatable through APIs and credentials outside source control.
+- Automate configuration through APIs.
+- Keep sensitive tax and wire instruction information out of the app by leveraging existing blue chip providers like Sharefile and Stripe.
 
 ## What the reviewer can do
 
-An invited reviewer signs in through a one-time email link and lands on `/demo`. The reviewer can switch between Investor and Sponsor perspectives to complete a fictional journey. Sponsor view is a simulation; it grants no actual administrator role.
+An invited reviewer signs in through a one-time email link and lands on `/demo`. The reviewer can switch between Investor and Sponsor perspectives to complete an illustrative journey. 
 
 1. Choose an investing entity type and sample commitment.
 2. Simulate accreditation evidence arriving.
@@ -33,7 +30,6 @@ Reset or refresh to start again. Walkthrough progress lives only in browser memo
 
 The [illustrated investor journey](docs/INVESTOR-JOURNEY.md) includes all 10 screens: login, commitment, accreditation, sponsor review, signing, countersign, funding, incoming match, reporting, and the capital statement.
 
-These are actual renders of the sanitized UI components in an isolated local browser. Authentication actions were stubbed only in the temporary capture harness; the supplied application still requires real login. No live account, provider, or investor database was accessed during capture.
 
 | Choose an entity and commitment | Accreditation |
 |---|---|
@@ -47,32 +43,19 @@ These are actual renders of the sanitized UI components in an isolated local bro
 |---|---|
 | ![Illustrative property performance and investor distributions](docs/screenshots/09-reporting.png) | ![Illustrative capital statement for the fictional investor](docs/screenshots/10-capital-statement.png) |
 
-## What is implemented
 
-| Area | Current behavior | Limit |
-|---|---|---|
-| Access | Supabase invite-only email login, callback, session checks, and sign-out | Google login is not implemented |
-| Walkthrough | Interactive entity selection, commitment, verification, signing, countersign, funding, and activity | Investment actions are simulations and reset on refresh |
-| Reporting | Sample operations, occupancy, distributions, capital summary, and statement preview | No real performance, valuations, waterfall, or generated PDF |
-| Documents | Illustrative text previews in the walkthrough | No real certificate, offering packet, or signed agreement in the walkthrough |
-| Notifications | Stage-aware sample reminders and sponsor digest previews | Operational delivery is mocked; authentication emails use real SMTP |
-| Application foundation | Separate database-backed investor/admin routes, private-storage access, RLS, audit, and operational exceptions | These routes are not the synthetic walkthrough and require separate validation |
-| Configuration | Supabase Auth and Render deployment commands with previews and credential redaction | Account authorization, provider access, and DNS setup still require initial setup |
+## Technology Stack
 
-The database-backed `/portal`, `/admin`, and `/files` routes remain in the source. They can read or modify the Supabase project configured by the operator. Use a dedicated testing project containing synthetic records for evaluation. Do not connect this package to a production investor database.
-
-## Architecture and technology
-
-| Layer | Technology / responsibility |
+| Layer | Technology | responsibility |
 |---|---|
-| UI and server | Next.js App Router, React, TypeScript, server components and server actions |
-| Presentation | Plain CSS, responsive layouts, accessible labels and status text |
-| Identity | Supabase Auth, email magic links, SSR cookie sessions |
-| Database | Supabase Postgres, SQL migrations, row-level security, guards, and audit records |
-| Files | Supabase private object storage and short-lived signed download URLs |
-| Email | Resend SMTP for Supabase authentication emails |
+| UI and server | Next.js App Router, React, TypeScript | server components and server actions |
+| Presentation | Plain CSS | responsive layouts, accessible labels and status text |
+| Identity | Supabase Auth | email magic links, SSR cookie sessions |
+| Database | Supabase Postgres SQL | migrations, row-level security, guards, and audit records |
+| Files | Supabase | private object storage and short-lived signed download URLs |
+| Email | Resend | SMTP for Supabase | authentication emails |
 | Hosting | Render Node web service, custom domain, and HTTPS |
-| Tests | Node test runner, TypeScript test harnesses, and PGlite database checks |
+| Tests | Node | test runner, TypeScript test harnesses, and PGlite database checks |
 
 The supplied lockfile pins the shared source snapshot. The package currently declares Next.js 16, React 19, Supabase JS 2, and TypeScript 5; use the lockfile rather than independently upgrading dependencies.
 
@@ -215,8 +198,6 @@ npm run test:db
 npm run build
 ```
 
-The shared snapshot was checked with 95 application/script tests, 147 database checks, and a successful production build using Webpack before packaging. PGlite uses local auth/storage stubs; it does not establish hosted Supabase isolation or live-provider acceptance. The hosted login walkthrough has been exercised by its operator; that is narrower evidence than a complete production end-to-end suite.
-
 | Path | Purpose |
 |---|---|
 | `app/demo/`, `lib/demo-*.ts` | Protected synthetic walkthrough and reports |
@@ -228,11 +209,6 @@ The shared snapshot was checked with 95 application/script tests, 147 database c
 | `scripts/deploy-render.mjs` | Render API deployment and DNS-verification command |
 | `tests/` | Unit, regression and database checks |
 
-## Sharing and provenance
-
-This export omits Git history, populated environment files, account credentials, investor documents, database exports, deployment logs, dependencies, build output, and internal planning/agent files. Project/account addresses and offering labels have been replaced with generic examples. Financial fixtures and the fictional investor are presentation samples. The 10 screenshots were visually reviewed and contain only the sanitized UI and synthetic data, without browser chrome, real account details, tokens, or payment instructions.
-
-The export is a standalone evaluation snapshot, not a live backup or a production deployment bundle with credentials. Supply any hosted demo invitation separately. No open-source license is included.
 
 ### How this was built
 
